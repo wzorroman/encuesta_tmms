@@ -1,0 +1,226 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: #0a0a0f;
+    color: #e0e0f0;
+    padding: 2rem 1rem;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.neon-wrapper {
+    max-width: 760px;
+    width: 100%;
+}
+
+.neon-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.neon-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #0ff, #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 0.05em;
+}
+
+.neon-header p {
+    font-size: 0.85rem;
+    color: #6666aa;
+    margin-top: 0.4rem;
+}
+
+.neon-progress {
+    margin-bottom: 2rem;
+    font-size: 0.75rem;
+    color: #8888aa;
+    letter-spacing: 0.08em;
+}
+
+.neon-progress span { display: block; margin-bottom: 0.4rem; }
+
+.neon-track {
+    height: 4px;
+    background: #1a1a2e;
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+.neon-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #0ff, #a855f7);
+    border-radius: 99px;
+    transition: width 0.3s;
+    box-shadow: 0 0 8px rgba(0,255,255,0.3);
+}
+
+.neon-card {
+    background: linear-gradient(145deg, #12121e, #0e0e18);
+    border: 1px solid rgba(255,255,255,0.04);
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.neon-card:hover {
+    border-color: rgba(0, 255, 255, 0.08);
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.02);
+}
+
+.neon-pregunta {
+    font-size: 0.92rem;
+    font-weight: 400;
+    color: #c8c8e8;
+    line-height: 1.6;
+    margin-bottom: 0.75rem;
+}
+
+.neon-numero {
+    font-weight: 600;
+    color: #a855f7;
+    margin-right: 0.5rem;
+    font-size: 0.8rem;
+}
+
+.neon-opciones {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.neon-radio {
+    flex: 1;
+    min-width: 42px;
+    text-align: center;
+}
+
+.neon-radio input { display: none; }
+
+.neon-radio-glow {
+    display: block;
+    padding: 0.6rem 0.1rem;
+    border-radius: 10px;
+    border: 1.5px solid #1a1a3a;
+    background: transparent;
+    color: #5555aa;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.neon-radio-glow:hover {
+    border-color: #0ff;
+    color: #0ff;
+    box-shadow: 0 0 12px rgba(0, 255, 255, 0.08);
+}
+
+.neon-radio input:checked + .neon-radio-glow {
+    border-color: #a855f7;
+    background: linear-gradient(145deg, rgba(168,85,247,0.12), rgba(0,255,255,0.06));
+    color: #fff;
+    box-shadow: 0 0 16px rgba(168, 85, 247, 0.15);
+}
+
+.neon-field-label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #5555aa;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.35rem;
+}
+
+.neon-input {
+    width: 100%;
+    padding: 0.75rem 0;
+    border: none;
+    border-bottom: 1.5px solid #1a1a3a;
+    background: transparent;
+    color: #e0e0f0;
+    font-size: 0.9rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.neon-input:focus {
+    border-bottom-color: #a855f7;
+}
+
+.neon-input::placeholder {
+    color: #333366;
+}
+
+select.neon-input {
+    appearance: none;
+    cursor: pointer;
+}
+
+select.neon-input option {
+    background: #0a0a0f;
+    color: #e0e0f0;
+}
+
+.neon-btn {
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(0,255,255,0.15), rgba(168,85,247,0.15));
+    color: #0ff;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 0.5rem;
+    border: 1px solid rgba(0, 255, 255, 0.1);
+}
+
+.neon-btn:hover {
+    background: linear-gradient(135deg, rgba(0,255,255,0.25), rgba(168,85,247,0.25));
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.08);
+}
+
+.neon-btn-sm {
+    padding: 0.5rem 1.5rem;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(0,255,255,0.2), rgba(168,85,247,0.2));
+    color: #0ff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.neon-modal {
+    background: #0e0e1a;
+    border: 1px solid rgba(0, 255, 255, 0.1);
+    border-radius: 20px;
+}
+
+.pregunta-card.is-invalid .neon-card {
+    border-color: #ff4466;
+    box-shadow: 0 0 20px rgba(255, 68, 102, 0.08);
+}
+
+.pregunta-card.is-invalid .neon-pregunta {
+    color: #ff6688;
+}
+
+.pregunta-card.is-invalid .neon-numero {
+    color: #ff4466;
+}
+
+.pregunta-card.is-invalid .neon-radio-glow {
+    border-color: #ff4466;
+    color: #ff6688;
+}

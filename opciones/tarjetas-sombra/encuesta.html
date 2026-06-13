@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarjetas Sombra - TMMS-24</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+</head>
+<body>
+<div class="shadow-wrapper">
+    <div class="shadow-header">
+        <div class="shadow-header-icon">📋</div>
+        <h2>Encuesta TMMS-24</h2>
+        <p>Lee cada afirmación y selecciona la opción que mejor refleje tu opinión.</p>
+    </div>
+
+    <div class="shadow-progress-card">
+        <div class="d-flex justify-content-between align-items-center">
+            <span class="shadow-progress-label">Progreso</span>
+            <span class="shadow-progress-count" id="progreso-texto">0 / 24</span>
+        </div>
+        <div class="shadow-progress-track"><div class="shadow-progress-bar" id="barra-progreso" style="width:0%"></div></div>
+    </div>
+
+    <form id="form-encuesta" novalidate>
+        <div class="shadow-card-lg">
+            <div class="row g-4">
+                <div class="col-12">
+                    <label class="shadow-label">Nombre completo</label>
+                    <div class="shadow-input-wrap"><input class="shadow-input" name="nombre" placeholder="Ej: Juan Pérez" required onkeyup="this.value=this.value.toUpperCase()" autocomplete="off"></div>
+                </div>
+                <div class="col-sm-6">
+                    <label class="shadow-label">Grado</label>
+                    <div class="shadow-input-wrap"><select class="shadow-input" name="grado" required>
+                        <option value="">Seleccione...</option>
+                        <option value="1°">1°</option><option value="2°">2°</option>
+                        <option value="3°">3°</option><option value="4°">4°</option>
+                        <option value="5°">5°</option>
+                    </select></div>
+                </div>
+                <div class="col-sm-6">
+                    <label class="shadow-label">Sección</label>
+                    <div class="shadow-input-wrap"><input class="shadow-input" name="seccion" placeholder="A, B, C" onkeyup="this.value=this.value.toUpperCase()" autocomplete="off"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="preguntas-container"></div>
+
+        <button type="button" class="shadow-btn" id="btn-enviar">
+            <span class="shadow-btn-icon">✓</span> Enviar respuestas
+        </button>
+    </form>
+</div>
+
+<div class="modal fade" id="confirmModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-modal">
+            <div class="modal-body text-center p-4">
+                <div class="mb-2" style="font-size:2rem;">📝</div>
+                <p class="fw-semibold mb-1">¿Confirmar envío?</p>
+                <p class="small text-muted mb-3">Una vez enviado no podrás modificarlo.</p>
+                <div class="d-flex gap-2 justify-content-center">
+                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary px-4 shadow-btn-sm">Sí, guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const preguntas = [
+        "Presto mucha atención a los sentimientos.",
+        "Normalmente me preocupo mucho por lo que siento.",
+        "Normalmente dedico tiempo a pensar en mis emociones.",
+        "Pienso que merece la pena prestar atención a mis emociones y estado de ánimo.",
+        "Dejo que mis sentimientos afecten a mis pensamientos.",
+        "Pienso en mi estado de ánimo constantemente.",
+        "A menudo pienso en mis sentimientos.",
+        "Presto mucha atención a cómo me siento.",
+        "Tengo claros mis sentimientos.",
+        "Frecuentemente puedo definir mis sentimientos.",
+        "Casi siempre sé cómo me siento.",
+        "Normalmente conozco mis sentimientos sobre las personas.",
+        "A menudo me doy cuenta de mis sentimientos en diferentes situaciones.",
+        "Siempre puedo decir cómo me siento.",
+        "A veces puedo decir cuáles son mis emociones.",
+        "Puedo llegar a comprender mis sentimientos.",
+        "Aunque a veces me siento triste, suelo tener una visión optimista.",
+        "Aunque me sienta mal, procuro pensar en cosas agradables.",
+        "Cuando estoy triste, pienso en todos los placeres de la vida.",
+        "Intento tener pensamientos positivos aunque me sienta mal.",
+        "Si doy demasiadas vueltas a las cosas, complicándolas, trato de calmarme.",
+        "Me preocupo por tener un buen estado de ánimo.",
+        "Tengo mucha energía cuando me siento feliz.",
+        "Cuando estoy enfadado intento cambiar mi estado de ánimo."
+    ];
+    const etiquetas = ["Nada de acuerdo", "", "", "", "Totalmente de acuerdo"];
+    const container = document.getElementById('preguntas-container');
+    preguntas.forEach((texto, i) => {
+        const n = i+1;
+        const div = document.createElement('div');
+        div.className = 'pregunta-card';
+        div.innerHTML = `<div class="shadow-card"><div class="shadow-card-header"><span class="shadow-numero">${String(n).padStart(2,'0')}</span><p class="shadow-pregunta">${texto}</p></div><div class="shadow-opciones">${[1,2,3,4,5].map(v => `<label class="shadow-radio"><input type="radio" name="p_${n}" value="${v}" required><span class="shadow-radio-box">${v}</span></label>`).join('')}</div></div>`;
+        container.appendChild(div);
+    });
+</script>
+<script src="../comun.js"></script>
+</body>
+</html>

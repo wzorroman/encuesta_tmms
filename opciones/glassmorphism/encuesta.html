@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glassmorphism - TMMS-24</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="glass-container">
+    <div class="glass-header">
+        <h2>Encuesta TMMS-24</h2>
+        <p>Lee cada frase e indica tu grado de acuerdo. No hay respuestas correctas o incorrectas.</p>
+    </div>
+
+    <div class="glass-progress">
+        <div class="d-flex">
+            <span>Progreso</span>
+            <span id="progreso-texto">0 / 24</span>
+        </div>
+        <div class="progress"><div class="progress-bar" id="barra-progreso" style="width:0%"></div></div>
+    </div>
+
+    <form id="form-encuesta" novalidate>
+        <div class="glass-fieldset">
+            <div class="row g-3">
+                <div class="col-12">
+                    <label class="glass-label">Nombre completo <span style="color:#ffb3b3;">*</span></label>
+                    <input class="glass-input" name="nombre" placeholder="Ingrese su nombre" required onkeyup="this.value=this.value.toUpperCase()" autocomplete="off">
+                </div>
+                <div class="col-md-6">
+                    <label class="glass-label">Grado <span style="color:#ffb3b3;">*</span></label>
+                    <select class="glass-select" name="grado" required>
+                        <option value="">Seleccione...</option>
+                        <option value="1°">1°</option>
+                        <option value="2°">2°</option>
+                        <option value="3°">3°</option>
+                        <option value="4°">4°</option>
+                        <option value="5°">5°</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="glass-label">Sección</label>
+                    <input class="glass-input" name="seccion" placeholder="Ej: A, B, C" onkeyup="this.value=this.value.toUpperCase()" autocomplete="off">
+                </div>
+            </div>
+        </div>
+
+        <hr class="glass-divider">
+
+        <div id="preguntas-container">
+            <!-- injected by JS -->
+        </div>
+
+        <button type="button" class="glass-btn" id="btn-enviar">Enviar respuestas</button>
+    </form>
+</div>
+
+<div class="modal fade modal-glass" id="confirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Confirmar envío</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body"><p>¿Estás seguro de guardar tus respuestas?</p><p class="small opacity-75">Una vez enviado no podrás modificarlas.</p></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-primary" id="btn-confirmar">Sí, guardar respuestas</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const preguntas = [
+        "Presto mucha atención a los sentimientos.",
+        "Normalmente me preocupo mucho por lo que siento.",
+        "Normalmente dedico tiempo a pensar en mis emociones.",
+        "Pienso que merece la pena prestar atención a mis emociones y estado de ánimo.",
+        "Dejo que mis sentimientos afecten a mis pensamientos.",
+        "Pienso en mi estado de ánimo constantemente.",
+        "A menudo pienso en mis sentimientos.",
+        "Presto mucha atención a cómo me siento.",
+        "Tengo claros mis sentimientos.",
+        "Frecuentemente puedo definir mis sentimientos.",
+        "Casi siempre sé cómo me siento.",
+        "Normalmente conozco mis sentimientos sobre las personas.",
+        "A menudo me doy cuenta de mis sentimientos en diferentes situaciones.",
+        "Siempre puedo decir cómo me siento.",
+        "A veces puedo decir cuáles son mis emociones.",
+        "Puedo llegar a comprender mis sentimientos.",
+        "Aunque a veces me siento triste, suelo tener una visión optimista.",
+        "Aunque me sienta mal, procuro pensar en cosas agradables.",
+        "Cuando estoy triste, pienso en todos los placeres de la vida.",
+        "Intento tener pensamientos positivos aunque me sienta mal.",
+        "Si doy demasiadas vueltas a las cosas, complicándolas, trato de calmarme.",
+        "Me preocupo por tener un buen estado de ánimo.",
+        "Tengo mucha energía cuando me siento feliz.",
+        "Cuando estoy enfadado intento cambiar mi estado de ánimo."
+    ];
+    const etiquetas = ["Nada de acuerdo", "Algo de acuerdo", "Bastante de acuerdo", "Muy de acuerdo", "Totalmente de acuerdo"];
+    const container = document.getElementById('preguntas-container');
+    preguntas.forEach((texto, i) => {
+        const n = i + 1;
+        const div = document.createElement('div');
+        div.className = 'pregunta-card';
+        div.innerHTML = `<div class="glass-fieldset"><p class="pregunta-texto"><span class="pregunta-numero">${n}.</span>${texto}</p><div class="glass-opciones">${[1,2,3,4,5].map(v => `<label><input type="radio" name="p_${n}" value="${v}" required><span>${v}</span></label>`).join('')}</div></div>`;
+        container.appendChild(div);
+    });
+</script>
+<script src="../../templates/comun.js"></script>
+</body>
+</html>

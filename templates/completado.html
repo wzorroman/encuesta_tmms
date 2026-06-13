@@ -14,13 +14,16 @@
                 <div class="card shadow-sm border-0 text-center">
                     <div class="header-encuesta">
                         <div class="mb-3">
-                            <span style="font-size: 4rem;">&#10004;</span>
+                            <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-white" style="width: 80px; height: 80px;">
+                                <span style="color: #198754; font-size: 2.8rem; line-height: 1;">&#10004;</span>
+                            </span>
                         </div>
-                        <h2 class="mb-2">¡Encuesta completada!</h2>
+                        <h2 class="mb-2">¡Encuesta TMMS-24 RESPONDIDA!</h2>
                     </div>
                     <div class="card-body p-5">
                         <p class="fs-5 mb-1">Gracias</p>
-                        <p class="fs-3 fw-bold text-primary mb-3">{{ nombre }}</p>
+                        <p class="fs-3 fw-bold text-primary mb-1">{{ nombre }}</p>
+                        <p class="fs-5 text-muted mb-3">Grado: {{ grado }}{% if seccion %} &mdash; Secci&oacute;n {{ seccion }}{% endif %}</p>
                         <p class="text-muted mb-4">
                             Tus respuestas han sido guardadas correctamente.
                         </p>

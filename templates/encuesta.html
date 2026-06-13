@@ -8,13 +8,13 @@
     <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
 </head>
 <body class="bg-light">
-    <div class="container py-5">
+    <div class="container py-4">
         <div class="row justify-content-center">
-            <div class="col-lg-8">
+            <div class="col-12">
 
-                {% if request.args.get('error') %}
+                {% if error %}
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <strong>Error:</strong> Debes completar todos los campos obligatorios (nombre, género y grado).
+                    <strong>Error:</strong> Debes completar todos los campos obligatorios (nombre, género, grado, sección) y responder todas las preguntas.
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
                 {% endif %}
@@ -47,15 +47,17 @@
                                     <div class="col-md-8">
                                         <label for="nombre" class="form-label fw-semibold">Nombre completo <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control form-control-lg" id="nombre"
-                                               name="nombre" placeholder="Ingrese su nombre" onkeyup="this.value = this.value.toUpperCase();" required autocomplete="off">
+                                               name="nombre" placeholder="Ingrese su nombre"
+                                               value="{{ form_data.get('nombre', '') if form_data else '' }}"
+                                               onkeyup="this.value = this.value.toUpperCase();" required autocomplete="off">
                                         <div class="invalid-feedback">El nombre es obligatorio.</div>
                                     </div>
                                     <div class="col-md-4">
                                         <label for="genero" class="form-label fw-semibold">Género <span class="text-danger">*</span></label>
                                         <select class="form-select form-select-lg" id="genero" name="genero" required>
                                             <option value="">Seleccione...</option>
-                                            <option value="Masculino">Masculino</option>
-                                            <option value="Femenino">Femenino</option>
+                                            <option value="Masculino" {{ 'selected' if form_data and form_data.get('genero') == 'Masculino' else '' }}>Masculino</option>
+                                            <option value="Femenino" {{ 'selected' if form_data and form_data.get('genero') == 'Femenino' else '' }}>Femenino</option>
                                         </select>
                                         <div class="invalid-feedback">El género es obligatorio.</div>
                                     </div>
@@ -63,18 +65,20 @@
                                         <label for="grado" class="form-label fw-semibold">Grado <span class="text-danger">*</span></label>
                                         <select class="form-select form-select-lg" id="grado" name="grado" required>
                                             <option value="">Seleccione...</option>
-                                            <option value="1°">1°</option>
-                                            <option value="2°">2°</option>
-                                            <option value="3°">3°</option>
-                                            <option value="4°">4°</option>
-                                            <option value="5°">5°</option>
+                                            <option value="1°" {{ 'selected' if form_data and form_data.get('grado') == '1°' else '' }}>1°</option>
+                                            <option value="2°" {{ 'selected' if form_data and form_data.get('grado') == '2°' else '' }}>2°</option>
+                                            <option value="3°" {{ 'selected' if form_data and form_data.get('grado') == '3°' else '' }}>3°</option>
+                                            <option value="4°" {{ 'selected' if form_data and form_data.get('grado') == '4°' else '' }}>4°</option>
+                                            <option value="5°" {{ 'selected' if form_data and form_data.get('grado') == '5°' else '' }}>5°</option>
                                         </select>
                                         <div class="invalid-feedback">El grado es obligatorio.</div>
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="seccion" class="form-label fw-semibold">Sección</label>
+                                        <label for="seccion" class="form-label fw-semibold">Sección <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control form-control-lg" id="seccion"
-                                               name="seccion" placeholder="Ej: A, B, C" onkeyup="this.value=this.value.toUpperCase();" autocomplete="off">
+                                               name="seccion" placeholder="Ej: A, B, C"
+                                               value="{{ form_data.get('seccion', '') if form_data else '' }}"
+                                               onkeyup="this.value=this.value.toUpperCase();" autocomplete="off" required>
                                     </div>
                                 </div>
                             </div>
@@ -94,8 +98,10 @@
                                         <input type="radio"
                                                name="p_{{ p.id }}"
                                                id="p{{ p.id }}_{{ i }}"
-                                               value="{{ i }}" required>
-                                        <span class="radio-card-content">{{ i }} {{ etiquetas[i] }}</span>
+                                               value="{{ i }}"
+                                               {% if form_data and form_data.get('p_' ~ p.id|string) == i|string %}checked{% endif %}
+                                               required>
+                                        <span class="radio-card-content"><span class="stars">{{ '★' * i }}</span>{{ etiquetas[i] }}</span>
                                     </label>
                                     {% endfor %}
                                 </div>
@@ -103,7 +109,7 @@
                             {% endfor %}
 
                             <div class="d-grid gap-2 mt-4">
-                                <button type="button" class="btn btn-primary btn-lg" id="btn-enviar">
+                                <button type="button" class="btn btn-primary btn-lg" id="btn-enviar" disabled>
                                     Enviar respuestas
                                 </button>
                             </div>
@@ -154,32 +160,65 @@
             texto.textContent = respondidas + ' / ' + total;
         }
 
-        radios.forEach(r => r.addEventListener('change', function () {
-            actualizar();
-            const card = this.closest('.pregunta-item');
-            if (card && card.classList.contains('is-invalid')) {
-                const grupo = card.querySelectorAll('input[type="radio"]:checked').length;
-                if (grupo > 0) {
+        function sincronizarCheckeds() {
+            document.querySelectorAll('.pregunta-item').forEach(function (card) {
+                card.querySelectorAll('.radio-card').forEach(function (l) {
+                    l.classList.remove('radio-checked');
+                });
+                card.classList.remove('row-respondida');
+                const checked = card.querySelector('input[type="radio"]:checked');
+                if (checked) {
+                    const label = checked.closest('.radio-card');
+                    if (label) label.classList.add('radio-checked');
+                    card.classList.add('row-respondida');
+                }
+            });
+        }
+
+        function verificarTodoCompleto() {
+            const nombre = document.getElementById('nombre').value.trim();
+            const genero = document.getElementById('genero').value.trim();
+            const grado = document.getElementById('grado').value.trim();
+            const seccion = document.getElementById('seccion').value.trim();
+            const respondidas = document.querySelectorAll('.pregunta-item').length > 0
+                ? Array.from(document.querySelectorAll('.pregunta-item')).filter(el =>
+                    el.querySelectorAll('input[type="radio"]:checked').length > 0
+                ).length
+                : 0;
+            const completo = nombre && genero && grado && seccion && respondidas === total;
+            btnEnviar.disabled = !completo;
+            return completo;
+        }
+
+        sincronizarCheckeds();
+        verificarTodoCompleto();
+
+        document.querySelectorAll('#nombre, #genero, #grado, #seccion').forEach(function (el) {
+            el.addEventListener('change', verificarTodoCompleto);
+            el.addEventListener('keyup', verificarTodoCompleto);
+        });
+
+        radios.forEach(function (r) {
+            r.addEventListener('change', function () {
+                actualizar();
+                sincronizarCheckeds();
+                verificarTodoCompleto();
+                const card = this.closest('.pregunta-item');
+                if (card && card.classList.contains('is-invalid')) {
                     card.classList.remove('is-invalid');
                 }
-            }
-        }));
+            });
+        });
 
         btnEnviar.addEventListener('click', function (e) {
             form.classList.add('was-validated');
+            confirmModal.show();
+        });
 
-            const sinResponder = Array.from(document.querySelectorAll('.pregunta-item')).filter(el => {
-                return el.querySelectorAll('input[type="radio"]:checked').length === 0;
-            });
-
-            sinResponder.forEach(el => el.classList.add('is-invalid'));
-
-            if (sinResponder.length === 0) {
-                confirmModal.show();
-            } else {
-                const primera = sinResponder[0];
-                primera.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
+        form.addEventListener('submit', function () {
+            const btn = document.getElementById('btn-confirmar');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Enviando...';
         });
     </script>
 </body>

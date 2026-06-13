@@ -61,6 +61,17 @@ def encuesta():
     return render_template("encuesta.html", preguntas=preguntas)
 
 
+@app.route("/prueba-preguntas_v2")
+def prueba_preguntas_v2():
+    conn = get_db()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cur.execute("SELECT * FROM preguntas ORDER BY numero")
+    preguntas = cur.fetchall()
+    cur.close()
+    conn.close()
+    return render_template("encuesta_v2.html", preguntas=preguntas)
+
+
 @app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
     error = None
@@ -91,10 +102,11 @@ def admin_logout():
 
 @app.route("/guardar", methods=["POST"])
 def guardar():
-    nombre = request.form.get("nombre", "").strip()
+    nombre = request.form.get("nombre", "").strip().upper()
     genero = request.form.get("genero", "").strip()
     grado = request.form.get("grado", "").strip()
-    seccion = request.form.get("seccion", "").strip() or None
+    seccion = request.form.get("seccion", "").strip()
+    seccion = seccion.upper() if seccion else None
 
     if not nombre or not genero or not grado:
         return redirect(url_for("encuesta") + "?error=1")
@@ -131,17 +143,17 @@ def guardar():
 @app.route("/completado")
 def completado():
     encuestado_id = request.args.get("encuestado_id", type=int)
-    nombre = ""
+    nombre = grado = seccion = ""
     if encuestado_id:
         conn = get_db()
         cur = conn.cursor()
-        cur.execute("SELECT nombre FROM encuestados WHERE id = %s", (encuestado_id,))
+        cur.execute("SELECT nombre, grado, seccion FROM encuestados WHERE id = %s", (encuestado_id,))
         row = cur.fetchone()
         if row:
-            nombre = row[0]
+            nombre, grado, seccion = row
         cur.close()
         conn.close()
-    return render_template("completado.html", nombre=nombre)
+    return render_template("completado.html", nombre=nombre, grado=grado, seccion=seccion)
 
 
 @app.route("/admin")

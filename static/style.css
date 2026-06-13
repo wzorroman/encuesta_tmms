@@ -31,9 +31,22 @@
     line-height: 1.2;
     text-align: center;
     word-break: break-word;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.stars {
+    color: #FFCE54;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
 }
 
 .radio-card input:checked + .radio-card-content {
+    color: #fff;
+}
+
+.radio-card input:checked + .radio-card-content .stars {
     color: #fff;
 }
 
@@ -42,6 +55,44 @@
     border-color: #0d6efd;
     box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
     transform: translateY(-2px);
+}
+
+.radio-card.radio-checked {
+    background: #0d6efd;
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+    transform: translateY(-2px);
+}
+
+.radio-card.radio-checked .radio-card-content {
+    color: #fff;
+}
+
+.radio-card.radio-checked .stars {
+    color: #fff;
+}
+
+.radio-card:active {
+    transform: scale(0.95);
+}
+
+.pregunta-card.row-respondida {
+    border-left: 4px solid #198754;
+    background: rgba(25, 135, 84, 0.04);
+}
+
+@media (min-width: 641px) and (max-width: 1366px) {
+    .radio-card {
+        min-width: 60px;
+        min-height: 60px;
+        padding: 12px 14px;
+    }
+    .radio-card .radio-card-content {
+        font-size: 0.9rem;
+    }
+    .stars {
+        font-size: 1.3rem;
+    }
 }
 
 .opciones-escala {
@@ -119,6 +170,25 @@
 .pregunta-card.is-invalid .radio-card:hover {
     border-color: #dc3545;
     box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2);
+}
+
+@media (orientation: portrait) {
+    .container {
+        max-width: 100%;
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+    .radio-card .radio-card-content {
+        font-size: 0.78rem;
+    }
+    .stars {
+        font-size: 1.1rem;
+    }
+}
+
+#btn-enviar:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 @keyframes shake {

@@ -60,9 +60,16 @@
             opacity: 0.65;
             cursor: not-allowed;
         }
+        .radio-card {
+            height: 90px;
+        }
         .radio-card-content .stars {
             white-space: nowrap;
             font-size: 0.9rem;
+        }
+        .radio-card-content .label-text {
+            line-height: 1.2;
+            min-height: 2.4em;
         }
         .footer {
             text-align: center;
@@ -170,7 +177,7 @@
                                         {% for i in range(1, 6) %}
                                         <label class="radio-card" for="v2-p{{ p.id }}_{{ i }}">
                                             <input type="radio" name="p_{{ p.id }}" id="v2-p{{ p.id }}_{{ i }}" value="{{ i }}">
-                                            <span class="radio-card-content"><span class="stars">{{ '★' * i }}</span>{{ etiquetas[i] }}</span>
+                                            <span class="radio-card-content"><span class="stars">{{ '★' * i }}</span><span class="label-text">{{ etiquetas[i] }}</span></span>
                                         </label>
                                         {% endfor %}
                                     </div>

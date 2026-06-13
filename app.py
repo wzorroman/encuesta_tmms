@@ -50,7 +50,8 @@ def login_required(f):
     return decorated
 
 
-@app.route("/")
+
+@app.route("/prueba-preguntas_v1")
 def encuesta():
     conn = get_db()
     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
@@ -61,7 +62,7 @@ def encuesta():
     return render_template("encuesta.html", preguntas=preguntas)
 
 
-@app.route("/prueba-preguntas_v2")
+@app.route("/")
 def prueba_preguntas_v2():
     conn = get_db()
     cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)

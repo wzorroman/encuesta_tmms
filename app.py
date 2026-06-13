@@ -5,7 +5,7 @@ from functools import wraps
 
 import psycopg2
 import psycopg2.extras
-from flask import Flask, render_template, request, redirect, url_for, session, Response
+from flask import Flask, render_template, request, redirect, url_for, session, flash, Response
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
@@ -205,6 +205,46 @@ def admin():
         dimensiones=dimensiones,
         encuestados=encuestados,
     )
+
+
+@app.route("/admin/encuestados")
+@login_required
+def admin_encuestados():
+    conn = get_db()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cur.execute("""
+        SELECT e.id, e.nombre, e.genero, e.grado, e.seccion, e.created_at
+        FROM encuestados e
+        ORDER BY e.created_at DESC
+    """)
+    encuestados = cur.fetchall()
+    cur.close()
+    conn.close()
+    return render_template("admin_encuestados.html", encuestados=encuestados)
+
+
+@app.route("/admin/encuestados/<int:id>/editar", methods=["POST"])
+@login_required
+def admin_editar_encuestado(id):
+    nombre = request.form.get("nombre", "").strip().upper()
+    genero = request.form.get("genero", "").strip()
+    grado = request.form.get("grado", "").strip()
+    seccion = request.form.get("seccion", "").strip()
+    seccion = seccion.upper() if seccion else None
+    if not nombre or not genero or not grado:
+        flash("Todos los campos obligatorios deben estar completos.", "danger")
+        return redirect(url_for("admin_encuestados"))
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute(
+        "UPDATE encuestados SET nombre = %s, genero = %s, grado = %s, seccion = %s WHERE id = %s",
+        (nombre, genero, grado, seccion, id),
+    )
+    conn.commit()
+    cur.close()
+    conn.close()
+    flash("Encuestado actualizado correctamente.", "success")
+    return redirect(url_for("admin_encuestados"))
 
 
 @app.route("/admin/exportar-csv")

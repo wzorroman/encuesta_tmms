@@ -11,6 +11,8 @@
         .card { border: none; }
         .card-header { font-weight: 700; font-size: .9rem; }
         .fw-semibold { font-weight: 600; }
+        th[cursor] { user-select: none; }
+        th.sortable:hover { background: rgba(255,255,255,0.05); }
     </style>
 </head>
 <body>
@@ -63,13 +65,15 @@
                     <table class="table table-striped align-middle mb-0" id="tablaEncuestados">
                         <thead>
                             <tr>
-                                <th>Nombre</th>
-                                <th>G&eacute;nero</th>
-                                <th>Grado</th>
-                                <th>Secci&oacute;n</th>
+                                <th style="width:60px;cursor:pointer;" onclick="ordenar('id')" class="text-center">ID <span id="sort-id"></span></th>
+                                <th style="cursor:pointer;" onclick="ordenar('nombre')">Nombre <span id="sort-nombre"></span></th>
+                                <th style="cursor:pointer;" onclick="ordenar('genero')">G&eacute;nero <span id="sort-genero"></span></th>
+                                <th style="cursor:pointer;" onclick="ordenar('grado')">Grado <span id="sort-grado"></span></th>
+                                <th style="cursor:pointer;" onclick="ordenar('seccion')">Secci&oacute;n <span id="sort-seccion"></span></th>
                                 <th style="width:80px;text-align:center;">Acciones</th>
                             </tr>
                             <tr class="filtros">
+                                <th></th>
                                 <th><input type="text" class="form-control form-control-sm filtro-input" data-col="nombre" placeholder="Buscar nombre..."></th>
                                 <th>
                                     <select class="form-select form-select-sm filtro-input" data-col="genero">
@@ -100,7 +104,8 @@
                         </thead>
                         <tbody>
                             {% for e in encuestados %}
-                            <tr>
+                            <tr data-id="{{ e.id }}">
+                                <td class="text-center text-muted">{{ e.id }}</td>
                                 <td class="fw-semibold">{{ e.nombre }}</td>
                                 <td>{{ e.genero }}</td>
                                 <td>{{ e.grado }}</td>
@@ -111,7 +116,7 @@
                             </tr>
                             {% endfor %}
                             {% if encuestados|length == 0 %}
-                            <tr><td colspan="5" class="text-center text-muted py-4">No hay encuestados registrados</td></tr>
+                            <tr><td colspan="6" class="text-center text-muted py-4">No hay encuestados registrados</td></tr>
                             {% endif %}
                         </tbody>
                     </table>
@@ -164,46 +169,84 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const inputs = document.querySelectorAll('.filtro-input');
-        const rows = document.querySelectorAll('#tablaEncuestados tbody tr');
-        const countBadge = document.getElementById('totalCount');
+        var sortState = {};
 
-        function filtrar() {
-            const filtros = {};
-            inputs.forEach(function (inp) {
-                filtros[inp.dataset.col] = inp.value.toLowerCase().trim();
-            });
+        function ordenar(col) {
+            var tbody = document.querySelector('#tablaEncuestados tbody');
+            var rows = Array.from(tbody.querySelectorAll('tr'));
+            if (rows.length === 0) return;
+            var emptyRow = rows.find(function(r) { return r.querySelector('td[colspan]'); });
+            if (emptyRow) return;
 
-            let visibles = 0;
-            rows.forEach(function (row) {
-                const celdas = row.querySelectorAll('td');
-                const vals = {
-                    nombre:  celdas[0].textContent.toLowerCase().trim(),
-                    genero:  celdas[1].textContent.toLowerCase().trim(),
-                    grado:   celdas[2].textContent.toLowerCase().trim(),
-                    seccion: celdas[3].textContent.toLowerCase().trim(),
-                };
-                let mostrar = true;
-                for (const [col, val] of Object.entries(filtros)) {
-                    if (val === '') continue;
-                    if (!vals[col].includes(val)) {
-                        mostrar = false;
-                        break;
-                    }
-                }
-                row.style.display = mostrar ? '' : 'none';
-                if (mostrar) visibles++;
-            });
+            var index = col === 'id' ? 0 : col === 'nombre' ? 1 : col === 'genero' ? 2 : col === 'grado' ? 3 : 4;
+            var current = sortState[col] || null;
+            var next = current === null ? 'asc' : current === 'asc' ? 'desc' : null;
 
-            countBadge.textContent = visibles;
+            document.querySelectorAll('[id^="sort-"]').forEach(function(el) { el.textContent = ''; });
+
+            if (next) {
+                sortState[col] = next;
+                document.getElementById('sort-' + col).textContent = next === 'asc' ? ' \u25B2' : ' \u25BC';
+
+                rows.sort(function(a, b) {
+                    var va = a.children[index].textContent.trim();
+                    var vb = b.children[index].textContent.trim();
+                    if (col === 'id') return next === 'asc' ? parseInt(va) - parseInt(vb) : parseInt(vb) - parseInt(va);
+                    return next === 'asc' ? va.localeCompare(vb, 'es') : vb.localeCompare(va, 'es');
+                });
+            } else {
+                delete sortState[col];
+                rows.sort(function(a, b) { return parseInt(a.dataset.id) - parseInt(b.dataset.id); });
+            }
+
+            rows.forEach(function(r) { tbody.appendChild(r); });
+            filtrar();
         }
 
-        inputs.forEach(function (inp) {
-            const ev = inp.tagName === 'SELECT' ? 'change' : 'input';
-            inp.addEventListener(ev, filtrar);
+        document.addEventListener('DOMContentLoaded', function () {
+            sortState.id = 'desc';
+            document.getElementById('sort-id').textContent = ' \u25BC';
+
+            var inputs = document.querySelectorAll('.filtro-input');
+            var rows = document.querySelectorAll('#tablaEncuestados tbody tr');
+            var countBadge = document.getElementById('totalCount');
+
+            function filtrar() {
+                var filtros = {};
+                inputs.forEach(function (inp) {
+                    filtros[inp.dataset.col] = inp.value.toLowerCase().trim();
+                });
+
+                var visibles = 0;
+                rows.forEach(function (row) {
+                    if (row.querySelector('td[colspan]')) return;
+                    var celdas = row.querySelectorAll('td');
+                    var vals = {
+                        nombre:  celdas[1].textContent.toLowerCase().trim(),
+                        genero:  celdas[2].textContent.toLowerCase().trim(),
+                        grado:   celdas[3].textContent.toLowerCase().trim(),
+                        seccion: celdas[4].textContent.toLowerCase().trim(),
+                    };
+                    var mostrar = true;
+                    for (var col in filtros) {
+                        if (filtros[col] === '') continue;
+                        if (!vals[col].includes(filtros[col])) {
+                            mostrar = false;
+                            break;
+                        }
+                    }
+                    row.style.display = mostrar ? '' : 'none';
+                    if (mostrar) visibles++;
+                });
+
+                countBadge.textContent = visibles;
+            }
+
+            inputs.forEach(function (inp) {
+                var ev = inp.tagName === 'SELECT' ? 'change' : 'input';
+                inp.addEventListener(ev, filtrar);
+            });
         });
-    });
     </script>
 </body>
 </html>
